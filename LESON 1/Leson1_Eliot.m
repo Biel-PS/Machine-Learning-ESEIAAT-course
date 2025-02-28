@@ -38,24 +38,24 @@ Theta = ((A.')*A)\(A.')*b;
 end
 
 function th = IterativeSolver(A,b,theta0,ls,tol,titulo)
-th=theta0;
-error = 9999;
-i=1;
-gradplot=[0,0];
-fplot=[0,0];
-while (error>tol)
-   
-   grad = A'*A*th - A'*b;
-   th=th-ls*grad;
-   error=norm(grad);
-   gradplot(i)=error;
-   fplot(i)=0.5*(A*th-b)'*(A*th-b);
-   
-   i=i+1;
-   
-   
+    th=theta0;
+    error = 9999;
+    i=1;
+    gradplot=[0,0];
+    fplot=[0,0];
+    while (error>tol)
+       
+       grad = A'*A*th - A'*b;
+       th=th-ls*grad;
+       error=norm(grad);
+       gradplot(i)=error;
+       fplot(i)=0.5*(A*th-b)'*(A*th-b);
+       
+       i=i+1;
+       
+       
+    end
 end
-nexttile;
 
 plot(gradplot);
 xlabel("number of iterations");
@@ -96,27 +96,22 @@ Thetav_iter = IterativeSolver(Av,bcv,theta0,ls,tol)
 
 
 function Theta = DirectSolver(A,b)  
-
-Theta = zeros(size(A,1),size(A,2));
-% if (size(A,1) < size(A,2))
-% disp ('Horizontal shape')
-% end
-Theta = ((A.')*A)\(A.')*b;
-
+    Theta = zeros(size(A,1),size(A,2));
+    % if (size(A,1) < size(A,2))
+    % disp ('Horizontal shape')
+    % end
+    Theta = ((A.')*A)\(A.')*b;
 end
 
 function th = IterativeSolver(A,b,theta0,ls,tol)
-th=theta0;
-error = 9999;
-while (error>tol)
-   grad = A'*A*th - A'*b;
-   th=th-ls*grad;
-   error=norm(grad);
-   disp (error)
-end
-
-
-
+    th=theta0;
+    error = 9999;
+    while (error>tol)
+       grad = A'*A*th - A'*b;
+       th=th-ls*grad;
+       error=norm(grad);
+       disp (error)
+    end
 end
 
 

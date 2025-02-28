@@ -1,6 +1,6 @@
 clear; clc; close all
 %Deffine initial parameters
-ls=1e-4;
+ls=5e-4;
 tol=1e-9;
 matCase = defMatrices();
 
@@ -8,7 +8,11 @@ matCase = defMatrices();
 fprintf ('Case n=m\n Direct Solver: \n')
 Thetac=DirectSolver(matCase.square.A,matCase.square.b);
 fprintf ('Case n=m\n Iterative Solver: \n')
-Thetac_iter = IterativeSolver(matCase.square.A,matCase.square.b,[0;0;0],ls,tol);
+[Thetac_iter,gradVector,ThetaVector] = IterativeSolver(matCase.square.A,matCase.square.b,[0;0;0],ls,tol);
+
+figure();
+loglog(ThetaVector(2:end),gradVector(2:end));
+
 
 % Case n<m (horizontal)
 fprintf ('Case n<m\n Direct Solver: \n')
@@ -43,11 +47,18 @@ function Theta = DirectSolver(A,b)
     Theta = ((A.')*A)\(A.')*b;
 end
 
-function th = IterativeSolver(A,b,th0,ls,tol)
+function [th,gradVector,ThetaVector] = IterativeSolver(A,b,th0,ls,tol)
     th=th0;
     error = 1;
+    i = 1;
+
+    gradVector = zeros(1,1);
+    ThetaVector = zeros(1,1);
+    
     while (error>tol)
        grad = A'*A*th - A'*b;
+       gradVector(end+1) = grad(1);
+       ThetaVector(end+1) = th(1);
        th=th-ls*grad;
        error=norm(grad);
        fprintf('Error: %d \n',error)
