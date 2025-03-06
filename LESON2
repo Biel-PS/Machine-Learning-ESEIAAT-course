@@ -1,4 +1,0 @@
-
-
-theta = 0.5
-noise = randi([0, theta], 1, 1)

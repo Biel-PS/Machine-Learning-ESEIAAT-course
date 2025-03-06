@@ -3,11 +3,11 @@ theta = zeros(10,1);
 theta1 =0.7;
 theta0 = 0.2;
 
-noiseMag = 1000;
+noiseMag = 2;
 
 theta = [theta0,theta1]
 
-sampleSize = 100;
+sampleSize = 10;
 
 x = zeros(sampleSize,2);
 x(:,2) = 1:1:sampleSize;
@@ -69,4 +69,10 @@ end
 
 function f = Functionf (theta,x)
     f = x*theta;
+end
+
+function historygram (dataSet,prediction)
+    
+    plot
+
 end
