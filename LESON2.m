@@ -3,23 +3,25 @@ theta = zeros(10,1);
 theta1 =0.7;
 theta0 = 0.2;
 
-theta = [theta0,theta1];
+noiseMag = 1000;
 
-sampleSize = 10;
+theta = [theta0,theta1]
+
+sampleSize = 100;
 
 x = zeros(sampleSize,2);
 x(:,2) = 1:1:sampleSize;
 x(:,1) = 1;
 
-y = setData (10,theta,x);
+y = setData (sampleSize,theta,x,noiseMag);
 
-thetaL2 = normL2(x,y);
+thetaL2 = normL2(x,y)
 fL2 = Functionf(thetaL2,x);
 
 thetaL1 = normL1 (x,y)
 fL1 = Functionf(thetaL1,x);
 
-thetaLinf = normLinf (x,y);
+thetaLinf = normLinf (x,y)
 fLinf = Functionf(thetaLinf,x);
 
 figure ();
@@ -31,10 +33,10 @@ plot (x(:,2),fLinf,DisplayName='Linf')
 hold off
 legend();
 
-function y = setData (sampleSize,theta,x)
+function y = setData (sampleSize,theta,x,noiseMag)
     noiseVec = zeros(sampleSize,1);
-    for i = 1:sampleSize
-        noiseVec(i) = 0.3*rand;
+    for i = 1:1:sampleSize
+        noiseVec(i) = noiseMag*rand;
     end
 y = x*theta' + noiseVec;
 
@@ -60,7 +62,7 @@ function theta = normLinf (x,y)
     A = [x,-identity; -x,-identity];
     b = [y;-y];
     th = linprog(fun,A,b);
-    theta = th(1:2)
+    theta = th(1:2);
 
 end
 
