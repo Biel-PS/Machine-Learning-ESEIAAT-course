@@ -4,7 +4,7 @@ theta = [0.01,0.02,0.3];
 noiseMag = 1000;
 sampleSize = 100;
 dataDeg = 2;
-capacity = 10;
+capacity = 5;
 trainDataRatio = 0.8;
 
 x = generateInitialX(dataDeg,sampleSize);
@@ -18,7 +18,7 @@ data = splitData (trainDataRatio,x,y);
 minSampleValue = 10;
 maxSampleValue = 1000;
 errorSampleSize = MSEVarSample (minSampleValue,maxSampleValue,theta,noiseMag,capacity,dataDeg);
-errorCapacityVariation = MSEVarCapacity (data,1,10)
+errorCapacityVariation = MSEVarCapacity (data,1,10);
 
 figure();
 hold on
@@ -48,12 +48,13 @@ yLinear = data.train.y;
 thLinear = normL2(xLinear,yLinear);
 funLinear = Functionf(thLinear,x(:,1:2));
 
-xHighCapTrain= setCapacity (capacity,data.train.x);
-yHighCapTrain = data.train.y;
-xHightCap = setCapacity (capacity,x(:,2));
+xTest= setCapacity(capacity,data.test.x);
+xTrain= setCapacity(capacity,data.train.x);
+yTrain = data.train.y;
+xHc = setCapacity(capacity,x(:,2));
 
-thLargeCapacity = normL2(xHighCapTrain,yHighCapTrain);
-funLargeCapacity = Functionf(thLargeCapacity,xHightCap);
+thLargeCapacity = normL2(xTrain,yTrain);
+funLargeCapacity = Functionf(thLargeCapacity,xHc);
 
 figure ();
 hold on
@@ -64,6 +65,11 @@ plot (x(:,2),funLargeCapacity,DisplayName='Overfitting');
 
 hold off
 legend();grid
+
+funTest = Functionf(thLargeCapacity,xTest);
+funTrain = Functionf(thLargeCapacity,xTrain);
+
+historyGram (data.train.y,funTrain,data.test.y,funTest);
 
 function error = MSEVarSample (initVal,maxVal,thetaInitial,noiseMag,capacity,deg)
     error = zeros ((maxVal-initVal),3); %training and test MSE
@@ -163,6 +169,10 @@ function error = MSE (dataY, fun)
     error = norm(dataY-fun)/size(dataY,1);
 end
 
+function error = absError (dataY, fun)
+    error =abs(dataY-fun);
+end
+
 function x = generateInitialX (deg,sampleSize)
     x = zeros(sampleSize,2);
     x(:,1) = ones(size(x,1),1);
@@ -170,6 +180,30 @@ function x = generateInitialX (deg,sampleSize)
     
     x = setCapacity(deg,x);
 end
+
+function historyGram (dataYTrain,funTrain,dataYTest,funTest)
+
+    errorTrain = absError (dataYTrain, funTrain);
+    numPointTrain = 1:1:size(errorTrain,1);
+
+    errorTest = absError (dataYTest, funTest);
+    numPointTest = 1:1:size(errorTest,1);
+
+    figure();
+    bar(numPointTrain',errorTrain(:));
+    xlabel('Point number');
+    ylabel('Error MSE in point')
+    title('Error per point distribution TRAIN data');
+    legend();    
+        figure();
+    bar(numPointTest', errorTest(:));
+    xlabel('Point number');
+    ylabel('Error MSE in point')
+    title('Error per point distribution TEST data');
+    legend();    
+end
+
+
 %% Unused functions
 
 function theta = normL1 (x,y)
