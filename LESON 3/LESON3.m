@@ -1,27 +1,23 @@
 clear; clc; close all
 
-theta2 = 0.5;
-theta1 =0.7;
-theta0 = 0.2;
-theta = [theta0,theta1,theta2];
+theta = [0.01,0.02,0.3];
+noiseMag = 1000;
+sampleSize = 100;
+dataDeg = 2;
+capacity = 10;
+trainDataRatio = 0.8;
 
-noiseMag = 100;
-capacity = 2;
-sampleSize = 70;
-
-x = zeros(sampleSize,3);
-x(:,2) = (-sampleSize/2):1:(sampleSize/2 -1 );
-x(:,3) = x(:,2).^2;
-x(:,1) = 1;
-X = x(:,1:2);
-
+x = generateInitialX(dataDeg,sampleSize);
 y = setData (sampleSize,theta,x,noiseMag);
-data = splitData (0.8,x,y);
+
+data = splitData (trainDataRatio,x,y);
+
+
+%%MSE comparison
 
 minSampleValue = 10;
 maxSampleValue = 1000;
-%%MSE comparison
-errorSampleSize = MSEVarSample (data,minSampleValue,maxSampleValue,theta,noiseMag,capacity);
+errorSampleSize = MSEVarSample (minSampleValue,maxSampleValue,theta,noiseMag,capacity,dataDeg);
 errorCapacityVariation = MSEVarCapacity (data,1,10)
 
 figure();
@@ -45,15 +41,16 @@ hold off
 legend(); grid;
 
 %%Linear and plynomical model comparison
+
 xLinear = [ones(size(data.train.x)),data.train.x];
 yLinear = data.train.y;
 
 thLinear = normL2(xLinear,yLinear);
-funLinear = Functionf(thLinear,X(:,1:2));
+funLinear = Functionf(thLinear,x(:,1:2));
 
 xHighCapTrain= setCapacity (capacity,data.train.x);
 yHighCapTrain = data.train.y;
-xHightCap = setCapacity (capacity,X(:,2));
+xHightCap = setCapacity (capacity,x(:,2));
 
 thLargeCapacity = normL2(xHighCapTrain,yHighCapTrain);
 funLargeCapacity = Functionf(thLargeCapacity,xHightCap);
@@ -62,26 +59,19 @@ figure ();
 hold on
 scatter (data.train.x,data.train.y,"blue",DisplayName= "training data");
 scatter (data.test.x,data.test.y,"red",DisplayName= "test data");
-plot (X(:,2),funLinear,DisplayName='Lineal')
-plot (X(:,2),funLargeCapacity,DisplayName='Overfitting');
+plot (x(:,2),funLinear,DisplayName='Lineal')
+plot (x(:,2),funLargeCapacity,DisplayName='Overfitting');
 
 hold off
 legend();grid
 
-function error = MSEVarSample (data,initVal,maxVal,thetaInitial,noiseMag,capacity)
-    
+function error = MSEVarSample (initVal,maxVal,thetaInitial,noiseMag,capacity,deg)
     error = zeros ((maxVal-initVal),3); %training and test MSE
-    
     for i = initVal:1:maxVal
         x = zeros(i,3);
-
-        lim =  (i/2);
-        x(:,2) = (-lim):1:(lim-1);
-        x(:,3) = x(:,2).^2;
-        x(:,1) = 1;
-       
+        x = generateInitialX(deg,i);
         y = setData (i,thetaInitial,x,noiseMag);
-        
+ 
         data = splitData (0.8,x,y);
     
         xTrain= setCapacity (capacity,data.train.x);
@@ -103,22 +93,15 @@ function error = MSEVarSample (data,initVal,maxVal,thetaInitial,noiseMag,capacit
 
 end
 
-
-
 function error = MSEVarCapacity (data,minCapacity,maxCapacity)
-
     error = zeros ((maxCapacity-minCapacity),3); %training and test MSE
-    
-    for i = minCapacity:1:maxCapacity
-    
-    
+    for i = minCapacity:1:maxCapacity   
         xTrain= setCapacity (i,data.train.x);
         yTrain = data.train.y;
 
         xTest = setCapacity (i,data.test.x);
         yTest = data.test.y;
       
-    
         thLargeCapacity = normL2(xTrain,yTrain);
 
         funEvalTrainingCase= Functionf(thLargeCapacity,xTrain);
@@ -143,34 +126,13 @@ function theta = normL2 (x,y)
    theta = ((x.')*x)\(x.')*y;
 end
 
-function theta = normL1 (x,y)
-    t = ones (size(x,1),1);
-    fun = [0;0;t];
-    identity = eye(size(x,1));
-    A = [x,-identity; -x,-identity];
-    b = [y;-y];
-    th = linprog(fun,A,b);
-    theta = th(1:2)
-end
-function theta = normLinf (x,y)
-    fun = [0;0;1];
-    identity = ones(size(x,1),1);
-    A = [x,-identity; -x,-identity];
-    b = [y;-y];
-    th = linprog(fun,A,b);
-    theta = th(1:2);
-end
-
-
 function f = Functionf (theta,x)
    f = x*theta;
 end
 
 function data = splitData (testRatio,x,y)
     sampleSize = size(y,1);
-    
     randomSet = randperm(sampleSize);
-    
     sampleSizeTest = round(sampleSize*testRatio);
     
     randomTest = randomSet(1:sampleSizeTest);
@@ -184,16 +146,47 @@ function data = splitData (testRatio,x,y)
 end
 
 function X = setCapacity (n,x) %NO CORSSED TERMS
-    prodMatrix = 0:1:(n+1);
-    
+    prodMatrix = 0:1:(n);
     X = zeros (size(x,1),size(prodMatrix,2));
+    if  (1 == size(x,2))
+        rhs = x(:,1);
+    else
+        rhs = x(:,2);
+    end
     for i = 1:size(prodMatrix,2)
-        X(:,i) = x(:,1);
+        X(:,i) = rhs;
     end
     X = X.^prodMatrix;
 end
 
-
 function error = MSE (dataY, fun)
     error = norm(dataY-fun)/size(dataY,1);
+end
+
+function x = generateInitialX (deg,sampleSize)
+    x = zeros(sampleSize,2);
+    x(:,1) = ones(size(x,1),1);
+    x(:,2) = (-sampleSize/2):1:(sampleSize/2 -1 );
+    
+    x = setCapacity(deg,x);
+end
+%% Unused functions
+
+function theta = normL1 (x,y)
+    t = ones (size(x,1),1);
+    fun = [0;0;t];
+    identity = eye(size(x,1));
+    A = [x,-identity; -x,-identity];
+    b = [y;-y];
+    th = linprog(fun,A,b);
+    theta = th(1:2);
+end
+
+function theta = normLinf (x,y)
+    fun = [0;0;1];
+    identity = ones(size(x,1),1);
+    A = [x,-identity; -x,-identity];
+    b = [y;-y];
+    th = linprog(fun,A,b);
+    theta = th(1:2);
 end
