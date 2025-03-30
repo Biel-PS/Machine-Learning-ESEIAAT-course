@@ -20,6 +20,7 @@ classdef dataFactory < handle
             for i = start:dataVolume
                 data.x(:,i) = (rand(size(data.x,1),1)-0.5.*I)*noiseMag;
             end
+            data.x(:,3) = data.x(:,3).*10;
             %data.x(:,end) = data.x(:,2);
             data.xLine = data.x;
             obj.x= data.x;
@@ -38,10 +39,10 @@ classdef dataFactory < handle
                 
                 cont = cont+1;
             end
-
+            %data1_new = h(:,1) > 0;
             data1 =h(:,1) > 0 & h(:,2) > 0 & h(:,3) > 0;  
-            data2 = h(:,1) < 0 & h(:,2) < 0 & h(:,3) > 0;
-            data3 = all(h(:,1) > 0 & h(:,2:length(theta)/dataSet) < 0,2);
+            data2 = h(:,1) < 0 & h(:,2) < 0 & h(:,3) < 0;
+            data3 = h(:,1) < 0 & h(:,2) < 0 & h(:,3) > 0;
             % data1 = h(:,:) > 0;  
             % data2 = h(:,:) < 0; :,:
             % data3 = h(:,1) < 0 & h(:,2:length(theta)/2) < 0;
@@ -53,6 +54,7 @@ classdef dataFactory < handle
             obj.data = data;
              
         end
+
         function data = splitData (obj,testRatio)
             data = obj.data;
             sampleSize = length(obj.data.y);
@@ -67,6 +69,11 @@ classdef dataFactory < handle
 
             data.test.x = data.x(randomTrain,:);
             data.test.y = data.y(randomTrain);
+        end
+
+        function data = reDefineData (obj)
+            obj.data.x = obj.data.x(any(obj.data.y(:,:),2));
+            data = obj.data
         end
         
     end

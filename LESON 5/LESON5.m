@@ -13,11 +13,11 @@ dataClass = dataFactory();
 
 data = dataClass.generateDataX(sampleVolume,dataVolume,noiseMagX,start);
 data = dataClass.generateDataY(theta,noiseMagData,dataSet);
+data = dataClass.reDefineData();
 
-
-x2L1 = -(data.x(:,2)*theta(2)+theta(1))/theta(3);
-x2L2 = -(data.x(:,2)*theta(5)+theta(4))/theta(6);
-x2L3 = -(data.x(:,2)*theta(8)+theta(7))/theta(9);
+x2L1 = -(data.xLine(:,2)*theta(2)+theta(1))/theta(3);
+x2L2 = -(data.xLine(:,2)*theta(5)+theta(4))/theta(6);
+x2L3 = -(data.xLine(:,2)*theta(8)+theta(7))/theta(9);
 
 figure();
 hold on

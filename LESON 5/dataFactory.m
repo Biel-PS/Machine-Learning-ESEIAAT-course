@@ -54,6 +54,7 @@ classdef dataFactory < handle
             obj.data = data;
              
         end
+
         function data = splitData (obj,testRatio)
             data = obj.data;
             sampleSize = length(obj.data.y);
@@ -68,6 +69,13 @@ classdef dataFactory < handle
 
             data.test.x = data.x(randomTrain,:);
             data.test.y = data.y(randomTrain);
+        end
+
+        function data = reDefineData (obj)
+            obj.data.x = obj.data.x(any(obj.data.y(:,:),2),:);
+            obj.data.y = obj.data.y(any(obj.data.y(:,:),2),:);
+            obj.x = obj.data.x
+            data = obj.data
         end
         
     end
