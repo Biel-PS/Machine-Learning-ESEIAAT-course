@@ -29,22 +29,22 @@ tau = 5e-6;
 tol = 1e-9;
 
 initialGuess = theta + 0.05;
-% 
-[thetaResult,cost] = solver (data,tau,tol,initialGuess);
+% % 
+% [thetaResult,cost] = solver (data,tau,tol,initialGuess);
 % 
 x1 = 2;
 x2 = 3;
-
-funResult = -(thetaResult(1) + thetaResult(2).*data.x(:,2) + thetaResult(4).*data.x(:,4))./thetaResult(3);
-generated = -(theta(1) + theta(2).*data.x(:,2) + theta(4).*data.x(:,4))./theta(3);
-
+% 
+% funResult = -(thetaResult(1) + thetaResult(2).*data.x(:,2) + thetaResult(4).*data.x(:,4))./thetaResult(3);
+% generated = -(theta(1) + theta(2).*data.x(:,2) + theta(4).*data.x(:,4))./theta(3);
+% 
 figure();
 hold on
-colors = [data.y, 1-data.y, zeros(size(data.y))];
-
+% colors = [data.y, 1-data.y, zeros(size(data.y))];
 % 
-plot (data.x(:,2),funResult,DisplayName='Boundary comptued')
-plot (data.x(:,2),generated,DisplayName='Boundary of generated data')
+% % 
+% plot (data.x(:,2),funResult,DisplayName='Boundary comptued')
+% plot (data.x(:,2),generated,DisplayName='Boundary of generated data')
 
 scatter(data.train.x(data.train.y, x1), data.train.x(data.train.y, x2), 50, 'g', 'filled', 'DisplayName', 'y = 1, train');
 scatter(data.train.x(~data.train.y, x1), data.train.x(~data.train.y, x2), 50, 'r', 'filled', 'DisplayName', 'y = 0, train');
