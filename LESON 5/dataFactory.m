@@ -74,8 +74,8 @@ classdef dataFactory < handle
         function data = reDefineData (obj)
             obj.data.x = obj.data.x(any(obj.data.y(:,:),2),:);
             obj.data.y = obj.data.y(any(obj.data.y(:,:),2),:);
-            obj.x = obj.data.x
-            data = obj.data
+            obj.x = obj.data.x;
+            data = obj.data;
         end
         
     end
