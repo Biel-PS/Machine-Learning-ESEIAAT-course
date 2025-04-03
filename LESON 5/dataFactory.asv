@@ -47,6 +47,10 @@ classdef dataFactory < handle
 
         function splitData (obj,testRatio)
             sampleSize = length(obj.data.x(any(obj.data.y(:,:),2), 2));
+            
+            sampleVec = 1:1:length(data.y(:,1));
+
+            NonZeroPos= sampleVec()
 
             randomSet = randperm(sampleSize);
             sampleSizeTest = round(sampleSize*testRatio);
@@ -54,8 +58,8 @@ classdef dataFactory < handle
             randomTest = randomSet(1:sampleSizeTest);
             randomTrain = randomSet((sampleSizeTest+1):end);
                  
-            obj.data.train.x(:,:) =  obj.data.x(randomTrain,:);
-            obj.data.test.x(:,:) =  obj.data.x(randomTest,:);
+            obj.data.train.x(:,:) =  obj.data.x(obj.data.y(randomTrain,:),:);
+            obj.data.test.x(:,:) =  obj.data.x(obj.data.y(randomTest,:),:,:);
 
             for i = 1:size(obj.data.y,2)
                 obj.splitDataFunctional(randomTest,randomTrain,i)
@@ -79,8 +83,8 @@ classdef dataFactory < handle
         function splitDataFunctional (obj,randomTest,randomTrain,index)
 
            
-            obj.data.train.y(:,index) =  obj.data.y(randomTrain,index);
-            obj.data.test.y(:,index) =  obj.data.y(randomTest,index);
+            obj.data.train.y(:,index) =  obj.data.y(obj.data.y(randomTrain,index),index);
+            obj.data.test.y(:,index) =  obj.data.y(obj.data.y(randomTest,index),index);
         end
     end
 end

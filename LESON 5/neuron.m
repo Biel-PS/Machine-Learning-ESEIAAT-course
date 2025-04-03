@@ -1,25 +1,31 @@
-classdef neuron
+classdef Neuron < handle
 
     properties (Access = private)
         numInput
-        theta
         x
 
     end
     
     methods (Access = public)
-        function obj = neuron(cParams)
+        function obj = Neuron(cParams)
             obj.init(cParams);
         end
-        function g = computeNeuron(obj)
-            g = obj.theta'*obj.x
+
+        function g = computeNeuron (obj,theta)
+            h = obj.computeH(theta);
+            g = obj.sigmoid(h);
         end
     end
     methods (Access = private)
-        function obj = init(obj,cParams)
+        function init(obj,cParams)
             obj.numInput = cParams.numInput;
-            obj.theta = cParams.theta;
             obj.x = cParams.x;
+        end       
+        function h = computeH(obj,theta)
+            h = obj.x*theta;
+        end
+        function sig = sigmoid (obj,h)
+            sig = 1/(1+exp(-h));
         end
     end
 end
