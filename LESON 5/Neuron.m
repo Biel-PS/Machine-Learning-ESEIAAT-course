@@ -25,7 +25,10 @@ classdef Neuron < handle
             h = obj.x*theta;
         end
         function sig = sigmoid (obj,h)
-            sig = 1/(1+exp(-h));
+            sig = 1./(1+exp(-h'));
+        end
+        function g= handSide (obj,h)
+            g = (h>0)';
         end
     end
 end

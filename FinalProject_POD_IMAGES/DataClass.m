@@ -5,50 +5,25 @@ classdef DataClass < handle
     Umat
     Smat
     Vmat
+
+    fileGeneratorCounter
     end
     
     methods (Access = public)
-        function obj = DataClass(cParams)
-            
+        function obj = DataClass()
+            obj.init();
         end
         
         function outputArg = method1(obj,inputArg)
 
         end
 
-        function imagePreProcess (obj,imagePath,outputDir,gridSize)
-
-            img = imread(imagePath);
-            if size(img,3) == 3
-                img = rgb2gray(img);  % Convert to a gray scale
-            end
-            img = im2double(img);  % Convert to double
-
-            [fullHeight, fullWidth] = size(img); % Get whole image pixel dimensions
-            cellHeight = floor(fullHeight / gridSize); % find individual images
-            cellWidth = floor(fullWidth / gridSize);
-            
-            if ~exist(outputDir, 'dir') %Create a folder to store images
-                mkdir(outputDir);
-            end
-            
-            % Cut every image from the whole, to the individual files
-            counter = 1;
-            for row = 0:grid_size-1
-                for col = 0:grid_size-1
-                    y1 = row * cellHeight + 1;
-                    y2 = y1 + cellHeight - 1;
-                    x1 = col * cellWidth + 1;
-                    x2 = x1 + cellWidth - 1;
-                    
-                    subimg = img(y1:y2, x1:x2);
-                    filename = fullfile(outputDir, sprintf('face_%d.png', counter));
-                    imwrite(subimg, filename);
-                    fprintf('Saved: %s\n', filename);
-                    counter = counter + 1;
-                end
+        function imagePreProcess(obj,imagePath,outputDir,gridSize)            
+            for i = 1:size(imagePath,1)
+                obj.imgProcess(imagePath(i,:),outputDir,gridSize(i))
             end
         end
+
 
         function solveEigenFaces(obj,folderTrainData,eigenToShow,r,label)
 
@@ -82,8 +57,8 @@ classdef DataClass < handle
         end
     end
     methods (Access = private)
-        function init (obj,cParams)
-
+        function init (obj)
+            obj.fileGeneratorCounter = 1;
         end
 
         function recon = projectInSpace (obj,U,X,meanFace,r)
@@ -130,6 +105,39 @@ classdef DataClass < handle
             subplot(1,2,2);
             imshow(reshape(recon, m, n));
             title(['Reconstructed with r = ', num2str(r)]);
+        end
+        function imgProcess (obj,imagePath,outputDir,gridSize)
+
+            img = imread(imagePath);
+            if size(img,3) == 3
+                img = rgb2gray(img);  % Convert to a gray scale
+            end
+            img = im2double(img);  % Convert to double
+
+            [fullHeight, fullWidth] = size(img); % Get whole image pixel dimensions
+            cellHeight = floor(fullHeight / gridSize); % find individual images
+            cellWidth = floor(fullWidth / gridSize);
+            
+            if ~exist(outputDir, 'dir') %Create a folder to store images
+                mkdir(outputDir);
+            end
+            
+            % Cut every image from the whole, to the individual files
+           
+            for row = 0:gridSize-1
+                for col = 0:gridSize-1
+                    y1 = row * cellHeight + 1;
+                    y2 = y1 + cellHeight - 1;
+                    x1 = col * cellWidth + 1;
+                    x2 = x1 + cellWidth - 1;
+                    
+                    subimg = img(y1:y2, x1:x2);
+                    filename = fullfile(outputDir, sprintf('face_%d.png', obj.fileGeneratorCounter));
+                    imwrite(subimg, filename);
+                    fprintf('Saved: %s\n', filename);
+                    obj.fileGeneratorCounter = obj.fileGeneratorCounter + 1;
+                end
+            end
         end
     end
 end

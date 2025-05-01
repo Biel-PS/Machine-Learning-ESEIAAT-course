@@ -1,13 +1,13 @@
 clear; clc; close all
 
 theta = [0.01,0.02,0.3];
-noiseMag = 2000;
-sampleSize = 100000;
+noiseMag = 2;
+sampleSize = 10;
 dataDeg = 2;
-capacity = 5;
+capacity = 6;
 trainDataRatio = 0.8;
 
-lam = 10000;
+lam = 0;
 computeError = false;
 
 x = generateInitialX(dataDeg,sampleSize);

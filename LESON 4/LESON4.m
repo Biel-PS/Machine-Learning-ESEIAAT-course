@@ -7,7 +7,7 @@ dataVolume = 4;
 sampleVolume = 500;
 trainDataRatio = 0.8;
 start = 2;
-
+%%S'HA DE FER FUNCIONAR AIXOS
 data.x = zeros(sampleVolume,dataVolume);
 
 I = ones(size(data.x,1),1);
